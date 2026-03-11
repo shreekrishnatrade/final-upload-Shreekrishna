@@ -1,0 +1,27 @@
+# robots.txt — Shreekrishna Repair & Services
+# https://shreekrishnatrade.com.np/
+
+User-agent: *
+Allow: /
+
+# Block sensitive directories
+Disallow: /admin/
+Disallow: /backend/
+Disallow: /database/
+Disallow: /includes/
+Disallow: /logs/
+
+# Block sensitive files
+Disallow: /admin.html
+Disallow: /*.php$
+Disallow: /*.sql$
+Disallow: /*.log$
+Disallow: /debug_output.html
+Disallow: /migrate-data.html
+Disallow: /migrate-localStorage-to-db.php
+Disallow: /fix_password.php
+Disallow: /test_debug.php
+Disallow: /test_debug_simple.php
+
+# Sitemap location
+Sitemap: https://shreekrishnatrade.com.np/sitemap.xml

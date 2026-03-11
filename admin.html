@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Shreekrishna</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<!-- Admin Login Overlay -->
+<div id="adminLoginOverlay"
+  class="position-fixed top-0 start-0 w-100 h-100 bg-light d-flex justify-content-center align-items-center"
+  style="z-index: 2000;">
+  <div class="card p-4 shadow" style="width: 350px;">
+    <h4 class="text-center mb-3">Admin Panel</h4>
+    <form id="adminLoginForm">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" id="adminUser" class="form-control" placeholder="admin" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" id="adminPass" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Interface (Hidden by default) -->
+<div id="adminApp" class="d-none">
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="admin-sidebar p-3 d-flex flex-column flex-shrink-0" style="width: 250px;">
+      <a href="index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <span class="fs-4">Shreekrishna Admin</span>
+      </a>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item"><a href="#" class="nav-link active" data-tab="dashboard">Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-tab="requests">Service Requests</a></li>
+        <li><a href="#" class="nav-link" data-tab="clients">Clients / Members</a></li>
+        <li><a href="#" class="nav-link" data-tab="projects">Projects</a></li>
+        <li><a href="#" class="nav-link" data-tab="offers">Offers</a></li>
+        <li><a href="#" class="nav-link" data-tab="faqs">Chatbot FAQs</a></li>
+        <li><a href="#" class="nav-link" data-tab="settings">Settings</a></li>
+      </ul>
+      <hr>
+      <button id="adminLogout" class="btn btn-outline-light w-100">Sign out</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4 bg-light" style="height: 100vh; overflow-y: auto;">
+
+      <!-- Dashboard Tab -->
+      <div id="tab-dashboard" class="admin-tab">
+        <h2>Dashboard</h2>
+        <div class="row g-3 mt-2">
+          <div class="col-md-3">
+            <div class="card shadow-sm dashboard-stat-card">
+              <div class="card-body">
+                <h6 class="text-muted">Total Visitors</h6>
+                <h3 id="statVisitors">0</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm dashboard-stat-card">
+              <div class="card-body">
+                <h6 class="text-muted">Today's Visits</h6>
+                <h3 id="statToday">0</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm dashboard-stat-card">
+              <div class="card-body">
+                <h6 class="text-muted">Service Requests</h6>
+                <h3 id="statRequests">0</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm dashboard-stat-card">
+              <div class="card-body">
+                <h6 class="text-muted">Members</h6>
+                <h3 id="statMembers">0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="mt-5">Recent Requests</h4>
+        <div class="table-responsive bg-white rounded shadow-sm p-3">
+          <table class="table table-hover" id="dashboardRecentTable">
+            <!-- Populated by JS -->
+          </table>
+        </div>
+      </div>
+
+      <!-- Requests Tab -->
+      <div id="tab-requests" class="admin-tab d-none">
+        <h2>Manage Requests</h2>
+        <div class="table-responsive bg-white rounded shadow-sm p-3 mt-3">
+          <table class="table table-hover" id="requestsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Contact</th>
+                <th>Service</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody><!-- JS --></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Clients Tab -->
+      <div id="tab-clients" class="admin-tab d-none">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Clients & Members</h2>
+          <button class="btn btn-outline-success btn-sm" onclick="exportClients()">Export CSV</button>
+        </div>
+        <div class="table-responsive bg-white rounded shadow-sm p-3 mt-3">
+          <table class="table table-hover" id="clientsTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Plan</th>
+                <th>Joined</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody><!-- JS --></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Projects Tab -->
+      <div id="tab-projects" class="admin-tab d-none">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Projects Portfolio</h2>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalProject">Add
+            Project</button>
+        </div>
+        <div class="row g-3 mt-3" id="projectsList">
+          <!-- JS Rendered Cards -->
+        </div>
+      </div>
+
+      <!-- Offers Tab -->
+      <div id="tab-offers" class="admin-tab d-none">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Festival Offers</h2>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalOffer">Add Offer</button>
+        </div>
+        <div class="mt-3 bg-white p-3 rounded shadow-sm" id="offersList">
+          <!-- JS Rendered -->
+        </div>
+      </div>
+
+      <!-- FAQs Tab -->
+      <div id="tab-faqs" class="admin-tab d-none">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2>Chatbot FAQs</h2>
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalFAQ">Add FAQ</button>
+        </div>
+        <div class="mt-3">
+          <table class="table bg-white rounded shadow-sm" id="faqsTable">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="tab-settings" class="admin-tab d-none">
+        <h2>Settings</h2>
+        <div class="card p-4 mt-3 col-md-8">
+          <form id="settingsForm">
+            <div class="mb-3 form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="settingTheme">
+              <label class="form-check-label">Enable Dark Mode Default</label>
+            </div>
+            <h5>Membership Pricing</h5>
+            <div class="row g-2 mb-3">
+              <div class="col-4"><label>Silver Cost</label><input type="number" id="priceSilver" class="form-control">
+              </div>
+              <div class="col-4"><label>Silver Discount %</label><input type="number" id="discSilver"
+                  class="form-control"></div>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-4"><label>Gold Cost</label><input type="number" id="priceGold" class="form-control"></div>
+              <div class="col-4"><label>Gold Discount %</label><input type="number" id="discGold" class="form-control">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success">Save Settings</button>
+          </form>
+          <hr>
+          <button class="btn btn-danger btn-sm"
+            onclick="if(confirm('Clear all data?')) { localStorage.clear(); location.reload(); }">Reset All Data
+            (Dev)</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Project Modal -->
+<div class="modal fade" id="modalProject" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add/Edit Project</h5><button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="projectForm">
+          <input type="hidden" id="projId">
+          <div class="mb-3"><label>Title</label><input id="projTitle" class="form-control" required></div>
+          <div class="mb-3"><label>Description</label><textarea id="projDesc" class="form-control" required></textarea>
+          </div>
+          <div class="mb-3"><label>Image Path (e.g., img/project1.jpeg)</label><input id="projImg" class="form-control"
+              required value="img/project1.jpeg"></div>
+          <button class="btn btn-primary w-100">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Modal -->
+<div class="modal fade" id="modalFAQ" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add/Edit FAQ</h5><button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="faqForm">
+          <input type="hidden" id="faqId">
+          <div class="mb-3"><label>Question</label><input id="faqQ" class="form-control" required></div>
+          <div class="mb-3"><label>Answer</label><textarea id="faqA" class="form-control" required></textarea></div>
+          <button class="btn btn-primary w-100">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Offer Modal -->
+<div class="modal fade" id="modalOffer" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add/Edit Offer</h5><button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="offerForm">
+          <input type="hidden" id="offerId">
+          <div class="mb-3"><label>Offer Title</label><input id="offerTitle" class="form-control" required
+              placeholder="Flash Sale"></div>
+          <div class="mb-3"><label>Discount %</label><input type="number" id="offerDisc" class="form-control" required>
+          </div>
+          <div class="mb-3"><label>End Date</label><input type="datetime-local" id="offerDate" class="form-control"
+              required></div>
+          <button class="btn btn-primary w-100">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+</body>
+
+</html>
